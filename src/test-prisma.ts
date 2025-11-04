@@ -21,10 +21,10 @@ async function main(): Promise<void> {
 
 main()
   .then(() => {
-    console.log('✅ Conexión exitosa con Prisma');
+    console.log('Conectado a Prisma ');
   })
   .catch(async (error) => {
-    console.error('❌ Error:', error);
+    console.error('Error:', error);
     await prisma.$disconnect();
     process.exit(1);
   });
