@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workout Tracker</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .navbar {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar h1 {
+      color: #667eea;
+      font-size: 28px;
+    }
+
+    .navbar .user-info {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .navbar .user-info span {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #c0392b;
+    }
+
+    .btn-success {
+      background: #27ae60;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #229954;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 30px;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h2 {
+      color: #333;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 5px rgba(102, 126, 234, 0.2);
+    }
+
+    .auth-section {
+      text-align: center;
+    }
+
+    .auth-section h2 {
+      color: #667eea;
+      margin-bottom: 20px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px;
+      background: #f0f0f0;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn.active {
+      background: #667eea;
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .workout-list {
+      list-style: none;
+    }
+
+    .workout-item {
+      background: #f9f9f9;
+      padding: 15px;
+      margin-bottom: 12px;
+      border-radius: 5px;
+      border-left: 4px solid #667eea;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .workout-item .info h3 {
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .workout-item .info p {
+      color: #999;
+      font-size: 12px;
+    }
+
+    .workout-item .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .workout-item .actions button {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    .message {
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      animation: slideIn 0.3s ease;
+    }
+
+    .message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .loader {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-content h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      .navbar {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <h1>💪 Workout Tracker</h1>
+    <div class="user-info" id="userInfo" style="display: none;">
+      <span id="userName">Usuario</span>
+      <button class="btn btn-secondary" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Auth Section -->
+    <div id="authSection">
+      <div class="card auth-section">
+        <h2>Bienvenido al Workout Tracker</h2>
+        
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+          <button class="tab-btn" onclick="switchTab('register')">Registrarse</button>
+        </div>
+
+        <!-- Login Tab -->
+        <div id="login" class="tab-content active">
+          <div id="loginMessage"></div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" placeholder="tu@email.com">
+          </div>
+          <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" id="loginPassword" placeholder="••••••">
+          </div>
+          <button class="btn btn-primary" onclick="login()" style="width: 100%;">
+            Iniciar Sesión
+          </button>
+        </div>
+
+        <!-- Register Tab -->
+        <div id="register" class="tab-content">
+          <div id="registerMessage"></div>
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" id="registerName" placeholder="Tu nombre">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="registerEmail" placeholder="tu@email.com">
+          </div>
+          <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" id="registerPassword" placeholder="••••••">
+          </div>
+          <button class="btn btn-primary" onclick="register()" style="width: 100%;">
+            Registrarse
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Section (oculto hasta login) -->
+    <div id="dashboardSection" style="display: none;">
+      <div class="content">
+        <!-- Crear Workout -->
+        <div class="card">
+          <h2>Crear Workout</h2>
+          <div id="createMessage"></div>
+          <div class="form-group">
+            <label>Título</label>
+            <input type="text" id="workoutTitle" placeholder="Mi sesión de entrenamiento">
+          </div>
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea id="workoutDescription" placeholder="Describe tu workout..." rows="4"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Duración (minutos)</label>
+            <input type="number" id="workoutDuration" placeholder="30">
+          </div>
+          <button class="btn btn-primary" onclick="createWorkout()" style="width: 100%;">
+            Crear Workout
+          </button>
+        </div>
+
+        <!-- Mis Workouts -->
+        <div class="card">
+          <h2>Mis Workouts</h2>
+          <div id="workoutMessage"></div>
+          <ul class="workout-list" id="workoutList">
+            <li style="color: #999; text-align: center; padding: 20px;">Cargando workouts...</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Perfil -->
+      <div class="card" style="margin-top: 30px;">
+        <h2>Mi Perfil</h2>
+        <div id="profileInfo" style="color: #666; line-height: 1.8;">
+          Cargando...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:3000';
+
+    // ============ AUTH ============
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tab).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    async function register() {
+      const name = document.getElementById('registerName').value;
+      const email = document.getElementById('registerEmail').value;
+      const password = document.getElementById('registerPassword').value;
+
+      if (!name || !email || !password) {
+        showMessage('registerMessage', 'Por favor rellena todos los campos', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          showMessage('registerMessage', data.message || 'Error en el registro', 'error');
+          return;
+        }
+
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('refresh_token', data.refresh_token);
+        
+        showMessage('registerMessage', '¡Registrado exitosamente!', 'success');
+        setTimeout(() => showDashboard(), 1500);
+      } catch (error) {
+        showMessage('registerMessage', 'Error: ' + error.message, 'error');
+      }
+    }
+
+    async function login() {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      if (!email || !password) {
+        showMessage('loginMessage', 'Por favor rellena email y contraseña', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          showMessage('loginMessage', data.message || 'Error en login', 'error');
+          return;
+        }
+
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('refresh_token', data.refresh_token);
+
+        showMessage('loginMessage', '¡Login exitoso!', 'success');
+        setTimeout(() => showDashboard(), 1500);
+      } catch (error) {
+        showMessage('loginMessage', 'Error: ' + error.message, 'error');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      location.reload();
+    }
+
+    // ============ WORKOUTS ============
+    async function createWorkout() {
+      const title = document.getElementById('workoutTitle').value;
+      const description = document.getElementById('workoutDescription').value;
+      const duration = parseInt(document.getElementById('workoutDuration').value);
+
+      if (!title) {
+        showMessage('createMessage', 'El título es requerido', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetchWithAuth(`${API_URL}/workouts`, {
+          method: 'POST',
+          body: JSON.stringify({
+            title,
+            description,
+            duration_minutes: duration || null
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          showMessage('createMessage', error.message || 'Error al crear workout', 'error');
+          return;
+        }
+
+        showMessage('createMessage', '✅ Workout creado exitosamente', 'success');
+        document.getElementById('workoutTitle').value = '';
+        document.getElementById('workoutDescription').value = '';
+        document.getElementById('workoutDuration').value = '';
+
+        await loadWorkouts();
+      } catch (error) {
+        showMessage('createMessage', 'Error: ' + error.message, 'error');
+      }
+    }
+
+    async function loadWorkouts() {
+      try {
+        const response = await fetchWithAuth(`${API_URL}/workouts/my-workouts`);
+        const workouts = await response.json();
+
+        const workoutList = document.getElementById('workoutList');
+        
+        if (!workouts || workouts.length === 0) {
+          workoutList.innerHTML = '<li style="color: #999; text-align: center; padding: 20px;">Sin workouts aún</li>';
+          return;
+        }
+
+        workoutList.innerHTML = workouts.map(w => `
+          <li class="workout-item">
+            <div class="info">
+              <h3>${w.title}</h3>
+              <p>${w.description || 'Sin descripción'}</p>
+              <p>⏱️ ${w.duration_minutes || '?'} minutos | ${w.completed ? '✅ Completado' : '⏳ Pendiente'}</p>
+            </div>
+            <div class="actions">
+              ${!w.completed ? `<button class="btn btn-success" onclick="completeWorkout(${w.id})">Completar</button>` : '<span style="color: #27ae60;">✅</span>'}
+            </div>
+          </li>
+        `).join('');
+      } catch (error) {
+        document.getElementById('workoutList').innerHTML = '<li style="color: #e74c3c;">Error al cargar workouts</li>';
+      }
+    }
+
+    async function completeWorkout(workoutId) {
+      try {
+        const response = await fetchWithAuth(`${API_URL}/workouts/${workoutId}/complete`, {
+          method: 'POST'
+        });
+
+        if (!response.ok) {
+          alert('Error al completar workout');
+          return;
+        }
+
+        showMessage('workoutMessage', '✅ Workout completado', 'success');
+        await loadWorkouts();
+      } catch (error) {
+        showMessage('workoutMessage', 'Error: ' + error.message, 'error');
+      }
+    }
+
+    // ============ PERFIL ============
+    async function loadProfile() {
+      try {
+        const response = await fetchWithAuth(`${API_URL}/auth/profile`);
+        const profile = await response.json();
+
+        document.getElementById('userName').textContent = profile.email;
+        document.getElementById('profileInfo').innerHTML = `
+          <p><strong>Email:</strong> ${profile.email}</p>
+          <p><strong>Rol:</strong> ${profile.role || 'Usuario'}</p>
+          <p><strong>ID:</strong> ${profile.userId}</p>
+        `;
+      } catch (error) {
+        document.getElementById('profileInfo').innerHTML = '<p style="color: #e74c3c;">Error al cargar perfil</p>';
+      }
+    }
+
+    // ============ HELPERS ============
+    async function fetchWithAuth(url, options = {}) {
+      const token = localStorage.getItem('access_token');
+      
+      const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers
+      };
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      return fetch(url, {
+        ...options,
+        headers
+      });
+    }
+
+    function showMessage(elementId, message, type) {
+      const el = document.getElementById(elementId);
+      el.innerHTML = `<div class="message ${type}">${message}</div>`;
+      setTimeout(() => {
+        el.innerHTML = '';
+      }, 5000);
+    }
+
+    function showDashboard() {
+      document.getElementById('authSection').style.display = 'none';
+      document.getElementById('dashboardSection').style.display = 'block';
+      document.getElementById('userInfo').style.display = 'flex';
+      loadProfile();
+      loadWorkouts();
+    }
+
+    // ============ INIT ============
+    window.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        showDashboard();
+      }
+    });
+  </script>
+</body>
+</html>
