@@ -31,7 +31,7 @@ export interface GroupProgressResponse {
 export class ProgressService {
   constructor(private prisma: PrismaService) {}
 
-  // Obtener progreso personal del usuario
+
   async getUserProgress(userId: number) {
     const workouts = await this.prisma.workouts.findMany({
       where: { user_id: userId },
@@ -67,9 +67,9 @@ export class ProgressService {
     };
   }
 
-  // Obtener progreso de un usuario EN UN GRUPO
+
   async getUserGroupProgress(userId: number, groupId: number) {
-    // Verificar que el usuario es miembro del grupo
+
     const isMember = await this.prisma.group_members.findUnique({
       where: { user_id_group_id: { user_id: userId, group_id: groupId } },
     });
@@ -78,7 +78,7 @@ export class ProgressService {
       throw new NotFoundException('No eres miembro de este grupo');
     }
 
-    // Obtener workouts del usuario en el grupo
+
     const workouts = await this.prisma.workouts.findMany({
       where: { user_id: userId, group_id: groupId },
       include: { tasks: true },
@@ -112,7 +112,7 @@ export class ProgressService {
     };
   }
 
-  // Obtener progreso de TODO EL GRUPO
+
   async getGroupProgress(groupId: number): Promise<GroupProgressResponse> {
     const group = await this.prisma.groups.findUnique({
       where: { id: groupId },
@@ -122,12 +122,12 @@ export class ProgressService {
       throw new NotFoundException('Grupo no encontrado');
     }
 
-    // Obtener miembros del grupo
+
     const members = await this.prisma.group_members.findMany({
       where: { group_id: groupId },
     });
 
-    // Calcular progreso de cada miembro
+
     const membersProgress = await Promise.all(
       members.map(async member => {
         const progress = await this.getUserGroupProgress(member.user_id, groupId);
@@ -144,7 +144,7 @@ export class ProgressService {
       })
     );
 
-    // Calcular promedio grupal
+
     const totalMembersProgress = membersProgress.reduce(
       (acc, member) => {
         acc.totalWorkouts += member.totalWorkouts;
@@ -174,11 +174,10 @@ export class ProgressService {
     };
   }
 
-  // Obtener ranking del grupo (quien va adelante)
+
   async getGroupRanking(groupId: number) {
     const groupProgress = await this.getGroupProgress(groupId);
 
-    // Ordenar por porcentaje de completitud
     const ranking = groupProgress.membersProgress
       .sort((a, b) => b.percentage - a.percentage)
       .map((member, index) => ({

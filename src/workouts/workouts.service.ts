@@ -6,7 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class WorkoutsService {
   constructor(private prisma: PrismaService) {}
 
-  // Crear workout
+
   async createWorkout(
     userId: number,
     data: { title: string; description?: string; duration_minutes?: number; groupId?: number }
@@ -30,7 +30,7 @@ export class WorkoutsService {
     });
   }
 
-  // Obtener mis workouts
+
   async getUserWorkouts(userId: number) {
     return this.prisma.workouts.findMany({
       where: { user_id: userId },
@@ -46,7 +46,7 @@ export class WorkoutsService {
     });
   }
 
-  // Obtener workouts de un grupo
+
   async getGroupWorkouts(groupId: number) {
     return this.prisma.workouts.findMany({
       where: { group_id: groupId },
@@ -63,7 +63,7 @@ export class WorkoutsService {
     });
   }
 
-  // Obtener workout por ID
+
   async getWorkout(workoutId: number) {
     const workout = await this.prisma.workouts.findUnique({
       where: { id: workoutId },
@@ -85,7 +85,7 @@ export class WorkoutsService {
     return workout;
   }
 
-  // Marcar workout como completado
+
   async completeWorkout(workoutId: number, userId: number) {
     const workout = await this.getWorkout(workoutId);
 
@@ -93,7 +93,7 @@ export class WorkoutsService {
       throw new ForbiddenException('No puedes marcar este workout');
     }
 
-    // Marca todas las tareas como completadas
+
     await this.prisma.tasks.updateMany({
       where: { workout_id: workoutId },
       data: { completed: true, completed_at: new Date() },
@@ -113,7 +113,7 @@ export class WorkoutsService {
     });
   }
 
-  // Eliminar workout
+
   async deleteWorkout(workoutId: number, userId: number) {
     const workout = await this.getWorkout(workoutId);
 

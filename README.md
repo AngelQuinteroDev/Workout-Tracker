@@ -96,3 +96,310 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+
+# Workout Tracker API
+
+REST API for personal and group workout management, built with NestJS and PostgreSQL.
+
+## Features
+
+- 🔐 JWT Authentication with refresh tokens
+- 👤 User profiles and management
+- 🏋️ Workout tracking and management
+- 👥 Collaborative group system
+- 📊 Personal and group progress tracking
+- 🏆 Group rankings and statistics
+- 👑 Role-based access control (admin/member)
+
+## 📋 Prerequisites
+
+- Node.js (v16 or higher)
+- PostgreSQL (v12 or higher)
+- npm or yarn
+
+## ⚙️ Environment Setup
+
+Create a `.env` file in the root directory:
+```env
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USER=postgres
+DATABASE_PASSWORD=your_password
+DATABASE_NAME=workout_tracker
+
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRES_IN=15m
+JWT_REFRESH_SECRET=your_refresh_secret
+JWT_REFRESH_EXPIRES_IN=7d
+```
+
+## 📚 API Documentation
+
+### 🔐 Authentication
+
+#### Register User
+```http
+POST /auth/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+#### Login
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+**Response:**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+#### Refresh Token
+```http
+POST /auth/refresh
+Content-Type: application/json
+
+{
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+#### Logout
+```http
+POST /auth/logout
+Authorization: Bearer {access_token}
+```
+
+#### Get Profile
+```http
+GET /auth/profile
+Authorization: Bearer {access_token}
+```
+
+#### Get Current User
+```http
+GET /auth/me
+Authorization: Bearer {access_token}
+```
+
+---
+
+### 🏋️ Workouts
+
+#### Create Workout
+```http
+POST /workouts
+Authorization: Bearer {access_token}
+Content-Type: application/json
+
+{
+  "name": "Chest and Triceps Routine",
+  "description": "Strength training workout",
+  "exercises": [
+    {
+      "name": "Bench Press",
+      "sets": 4,
+      "reps": 10,
+      "weight": 80
+    }
+  ],
+  "groupId": "optional-group-id"
+}
+```
+
+#### Get Workout by ID
+```http
+GET /workouts/:id
+Authorization: Bearer {access_token}
+```
+
+#### Complete Workout
+```http
+POST /workouts/:id/complete
+Authorization: Bearer {access_token}
+```
+
+#### Delete Workout
+```http
+DELETE /workouts/:id
+Authorization: Bearer {access_token}
+```
+
+---
+
+### 📊 Progress
+
+#### My Personal Progress
+```http
+GET /progress/me
+Authorization: Bearer {access_token}
+```
+
+**Response:**
+```json
+{
+  "totalWorkouts": 45,
+  "completedThisWeek": 5,
+  "streak": 7,
+  "stats": {
+    "avgWorkoutsPerWeek": 6.2
+  }
+}
+```
+
+#### My Progress in Group
+```http
+GET /progress/group/:groupId/me
+Authorization: Bearer {access_token}
+```
+
+#### Group Overall Progress
+```http
+GET /progress/group/:groupId
+Authorization: Bearer {access_token}
+```
+
+#### Group Ranking
+```http
+GET /progress/group/:groupId/ranking
+Authorization: Bearer {access_token}
+```
+
+**Response:**
+```json
+[
+  {
+    "userId": "user-id-1",
+    "name": "John Doe",
+    "completedWorkouts": 32,
+    "position": 1
+  },
+  {
+    "userId": "user-id-2",
+    "name": "Jane Smith",
+    "completedWorkouts": 28,
+    "position": 2
+  }
+]
+```
+
+---
+
+### 👥 Groups
+
+#### Create Group
+```http
+POST /groups
+Authorization: Bearer {access_token}
+Content-Type: application/json
+
+{
+  "name": "CrossFit Team",
+  "description": "Functional training group"
+}
+```
+
+#### Get My Groups
+```http
+GET /groups/my-groups
+Authorization: Bearer {access_token}
+```
+
+#### Get Group Details
+```http
+GET /groups/:groupId
+Authorization: Bearer {access_token}
+```
+
+#### Get Group Members
+```http
+GET /groups/:groupId/members
+Authorization: Bearer {access_token}
+```
+
+#### Get Group Workouts
+```http
+GET /groups/:groupId/workouts
+Authorization: Bearer {access_token}
+```
+
+#### Update Member Role
+```http
+PUT /groups/:groupId/members/:userId/role
+Authorization: Bearer {access_token}
+Content-Type: application/json
+
+{
+  "role": "admin" // or "member"
+}
+```
+
+**Note:** Only admins can change roles.
+
+#### Remove Member from Group
+```http
+DELETE /groups/:groupId/members/:userId
+Authorization: Bearer {access_token}
+```
+
+**Note:** Only admins can remove members.
+
+#### Leave Group
+```http
+POST /groups/:groupId/leave
+Authorization: Bearer {access_token}
+```
+
+#### Delete Group
+```http
+DELETE /groups/:groupId
+Authorization: Bearer {access_token}
+```
+
+**Note:** Only the group creator can delete the group.
+
+---
+
+## 🔒 Authentication
+
+All endpoints (except `/auth/register` and `/auth/login`) require JWT authentication.
+
+Include the token in the header of each request:
+```
+Authorization: Bearer {your_access_token}
+```
+
+Access tokens expire in 15 minutes. Use the `/auth/refresh` endpoint to obtain a new token.
+
+---
+
+## 📁 Project Structure
+```
+src/
+├── auth/           # Authentication module
+├── users/          # Users module
+├── workouts/       # Workouts module
+├── groups/         # Groups module
+└── progress/       # Progress and statistics module
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the `LICENSE` file for details.
