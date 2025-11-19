@@ -392,14 +392,10 @@ Access tokens expire in 15 minutes. Use the `/auth/refresh` endpoint to obtain a
 ```
 src/
 ├── auth/           # Authentication module
-├── users/          # Users module
+├── prisma/         # Prisma module
 ├── workouts/       # Workouts module
 ├── groups/         # Groups module
 └── progress/       # Progress and statistics module
 ```
 
----
 
-## 📄 License
-
-This project is licensed under the MIT License - see the `LICENSE` file for details.
